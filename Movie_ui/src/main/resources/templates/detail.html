@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset='utf-8'>
+  <title>Docker & K8s assignment by jaenyeong.dev</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<div class="c2">
+  <marquee><p> Docker & K8s assignment by jaenyeong.dev </p></marquee>
+</div>
+<body>
+  <header>
+    <div class="nav">
+      <hr />
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="https://github.com/jaenyeong" target="_blank">My Github</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/upload">Upload Movies</a></li>
+        </ul>
+      </nav>
+      <hr />
+    </div>
+    <h1 class="headh1">Welcome To Free Movie Server</h1>
+    <h2 class="headh1">click on Show Button to see all movies</h2>
+    <h3>상세 정보</h3>
+
+    <div id="detail" style="padding-top: 5px; color: white">
+    </div>
+
+    <div style="padding-top: 5px">
+      <span style="color:white">제목 : </span> <label for="name"></label><input type="text" id="name" />
+      <br />
+      <span style="color:white">개봉일 : </span> <label for="releasedDt"></label><input type="text" id="releasedDt" />
+      <br />
+      <button onclick="update_card()">카드 수정</button>
+      <button onclick="home()">홈으로</button>
+    </div>
+  </header>
+
+  <!-- movie upload code  -->
+  <div class="cards"></div>
+
+</body>
+
+<script>
+  const requestUrl = 'http://172.30.7.133:30080';
+
+  $(function () {
+    get();
+  });
+
+  function get() {
+    let id = window.location.pathname.split('/')[2];
+
+    axios.get(requestUrl + '/movies/' + id, {}).then(function (response) {
+      $(`#detail`).html('');
+
+      let $id = response.data.data.id;
+      let $name = response.data.data.name;
+      let $releasedDt = response.data.data.releasedDt;
+
+      $('#detail').append(
+        '<h4>제목 : ' + $name + '</h4>' +
+        '<h4>개봉일 : ' + $releasedDt + '</h4>' +
+        '<input type="hidden" id="cardId" value="' + $id + '"/>' +
+        '</div></div>',
+      );
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  function update_card() {
+    let id = $('#cardId').val();
+    let name = $('#name').val();
+    let releasedDt = $('#releasedDt').val();
+
+    axios.request({
+      method: 'PUT',
+      url: requestUrl + '/movies/' + id,
+      data: {
+        name: name,
+        releasedDt: releasedDt,
+      },
+    }).then(
+      alert('카드가 수정됐습니다.'),
+    ).finally(function () {
+      get();
+    });
+  }
+
+  function home() {
+    window.location.href = '/';
+  }
+</script>
+</html>

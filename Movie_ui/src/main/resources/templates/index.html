@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset='utf-8'>
+  <title>Docker & K8s assignment by jaenyeong.dev</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<div class="c2">
+  <marquee><p> Docker & K8s assignment by jaenyeong.dev </p></marquee>
+</div>
+<body>
+  <header>
+    <div class="nav">
+      <hr />
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="https://github.com/jaenyeong" target="_blank">My Github</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/upload">Upload Movies</a></li>
+        </ul>
+
+      </nav>
+      <hr />
+    </div>
+    <h1 class="headh1">Welcome To Free Movie Server</h1>
+    <h2 class="headh1">click on Show Button to see all movies</h2>
+
+    <button id="showCardList" class="nbtn" onclick="filterSelection('all')">Show</button>
+
+    <div style="padding-top: 5px">
+      <span style="color:white">제목 : </span> <input type="text" id="name" /><br />
+      <span style="color:white">개봉일 : </span> <input type="text" id="releasedDt" /><br />
+      <button id="createCard" class="nbtn" onclick="create_card()">카드 생성</button>
+    </div>
+
+  </header>
+
+  <div class="cards"></div>
+
+</body>
+</html>
+
+<script>
+  const requestUrl = 'http://172.30.7.133:30080';
+
+  $(function () {
+    get();
+  });
+
+  function get() {
+    axios.get(requestUrl + '/movies', {}).then(function (response) {
+      $(".cards").html('');
+
+      let responseData = response.data.data
+
+      for (let i in responseData) {
+        let $id = responseData[i].id;
+        let $name = responseData[i].name;
+        let $releasedDt = responseData[i].releasedDt;
+
+        $(".cards").append(
+          '<div class="column nature"><div class="content">' +
+          '<h4>' + $name + '</h4>' +
+          '<h4>개봉일 : ' + $releasedDt + '</h4>' +
+          '<button onclick="delete_card(' + $id + ')">삭제</button>' +
+          '<button onclick="detail_card(' + $id + ')">상세보기</button>' +
+          '</div></div>',
+        );
+      }
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  function create_card() {
+    const name = $('#name').val();
+    const releasedDt = $('#releasedDt').val();
+
+    axios.request({
+      method: 'POST',
+      url: requestUrl + '/movies',
+      headers: {'Content-type': 'application/json'},
+      data: {
+        name: name,
+        releasedDt: releasedDt,
+      },
+    }).then(
+      alert('Create Success'),
+    ).finally(function () {
+      get();
+      setTimeout(function () {
+        $('#showCardList').click();
+      }, 300);
+    });
+  }
+
+  function delete_card(id) {
+    axios.delete(requestUrl + '/movies/' + id)
+      .then(function (response) {
+        get();
+        setTimeout(function () {
+          $('#showCardList').click();
+        }, 300);
+      })
+      .catch(function (response) {
+        console.log(response);
+      })
+      .then(function () {
+      });
+  }
+
+  function detail_card(id) {
+    window.location.href = 'detail/' + id;
+  }
+</script>

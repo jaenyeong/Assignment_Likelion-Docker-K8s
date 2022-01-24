@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: assignment-movie-ui
+  labels:
+    app: assignment-movie-ui
+spec:
+  containers:
+  - name: assignment-movie-ui
+    image: jaenyeongdev/assignment_movie-ui
+    imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: assignment-movie-ui
+spec:
+  selector:
+    app: assignment-movie-ui
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
+      nodePort: 30088
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: assignment-movie-api
+  labels:
+    app: assignment-movie-api
+spec:
+  containers:
+  - name: assignment-movie-api
+    image: jaenyeongdev/assignment_movie-api
+    imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: assignment-movie-api
+spec:
+  selector:
+    app: assignment-movie-api
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
